@@ -1886,7 +1886,7 @@ function FlatpickrInstance(
   }
 
   function open(
-    e?: FocusEvent | MouseEvent,
+    e?: FocusEvent | MouseEvent | KeyboardEvent,
     positionElement = self._positionElement
   ) {
     if (self.isMobile === true) {
@@ -1925,13 +1925,15 @@ function FlatpickrInstance(
         self.config.allowInput === false &&
         (e === undefined ||
           !(self.timeContainer as HTMLDivElement).contains(
-            e.relatedTarget as Node
+            (e as MouseEvent | FocusEvent)?.relatedTarget as Node
           ))
       ) {
         setTimeout(() => (self.hourElement as HTMLInputElement).select(), 50);
       }
       return;
     }
+
+    jumpToDate(undefined);
 
     if (!self.config.noCalendar && e?.type === "keydown") {
       focusOnDay(undefined, 0);
