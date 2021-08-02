@@ -1933,7 +1933,7 @@ function FlatpickrInstance(
       return;
     }
 
-    if (!self.config.noCalendar) {
+    if (!self.config.noCalendar && e?.type === "keydown") {
       focusOnDay(undefined, 0);
     }
   }
