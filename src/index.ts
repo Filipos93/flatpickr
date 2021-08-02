@@ -446,7 +446,7 @@ function FlatpickrInstance(
 
     if (self.daysContainer !== undefined) {
       bind(self.monthNav, "click", onMonthNavClick);
-
+      bind(self.monthNav, "keydown", onMonthNavKeyDown);
       bind(self.monthNav, ["keyup", "increment"], onYearInput);
       bind(self.daysContainer, "click", selectDate);
     }
@@ -698,7 +698,9 @@ function FlatpickrInstance(
 
     if (dateIsEnabled) {
       dayElement.tabIndex = -1;
+
       if (isDateSelected(date)) {
+        dayElement.tabIndex = 10;
         dayElement.classList.add("selected");
         self.selectedDateElem = dayElement;
 
@@ -945,7 +947,7 @@ function FlatpickrInstance(
       );
     };
 
-    self.monthsDropdownContainer.tabIndex = -1;
+    self.monthsDropdownContainer.tabIndex = 10;
 
     self.monthsDropdownContainer.innerHTML = "";
 
@@ -1009,7 +1011,7 @@ function FlatpickrInstance(
       monthElement = self.monthsDropdownContainer;
     }
 
-    const yearInput = createNumberInput("cur-year", { tabindex: "-1" });
+    const yearInput = createNumberInput("cur-year", { tabindex: "10" });
 
     const yearElement = yearInput.getElementsByTagName(
       "input"
@@ -1084,6 +1086,8 @@ function FlatpickrInstance(
     self.nextMonthNav = createElement("span", "flatpickr-next-month");
     self.nextMonthNav.innerHTML = self.config.nextArrow;
 
+    self.prevMonthNav.tabIndex = self.nextMonthNav.tabIndex = 10;
+
     buildMonths();
 
     Object.defineProperty(self, "_hidePrevMonthArrow", {
@@ -1139,7 +1143,7 @@ function FlatpickrInstance(
       "input"
     )[0] as HTMLInputElement;
 
-    self.hourElement.tabIndex = self.minuteElement.tabIndex = -1;
+    self.hourElement.tabIndex = self.minuteElement.tabIndex = 10;
 
     self.hourElement.value = pad(
       self.latestSelectedDateObj
@@ -1621,6 +1625,14 @@ function FlatpickrInstance(
     }
   }
 
+  function onMonthNavKeyDown(e: KeyboardEvent) {
+    switch (e.keyCode) {
+      case 13:
+      case 32:
+        onMonthNavClick(e);
+    }
+  }
+
   function onKeyDown(e: KeyboardEvent) {
     // e.key                      e.keyCode
     // "Backspace"                        8
@@ -1737,6 +1749,7 @@ function FlatpickrInstance(
         case 9:
           if (isTimeObj) {
             const elems = ([
+              self.selectedDateElem,
               self.hourElement,
               self.minuteElement,
               self.secondElement,
@@ -1752,16 +1765,7 @@ function FlatpickrInstance(
               e.preventDefault();
               (target || self._input).focus();
             }
-          } else if (
-            !self.config.noCalendar &&
-            self.daysContainer &&
-            self.daysContainer.contains(eventTarget as Node) &&
-            e.shiftKey
-          ) {
-            e.preventDefault();
-            self._input.focus();
           }
-
           break;
 
         default:
@@ -1926,6 +1930,11 @@ function FlatpickrInstance(
       ) {
         setTimeout(() => (self.hourElement as HTMLInputElement).select(), 50);
       }
+      return;
+    }
+
+    if (!self.config.noCalendar) {
+      focusOnDay(undefined, 0);
     }
   }
 
@@ -2315,6 +2324,10 @@ function FlatpickrInstance(
         selectedDate.getMonth() >
           self.currentMonth + self.config.showMonths - 1) &&
       self.config.mode !== "range";
+
+    if (self.selectedDateElem) self.selectedDateElem.tabIndex = -1;
+
+    target.tabIndex = 10;
 
     self.selectedDateElem = target;
 
@@ -2815,7 +2828,7 @@ function FlatpickrInstance(
     if (triggerChange !== false) triggerEvent("onValueUpdate");
   }
 
-  function onMonthNavClick(e: MouseEvent) {
+  function onMonthNavClick(e: UIEvent) {
     const eventTarget = getEventTarget(e);
     const isPrevMonth = self.prevMonthNav.contains(eventTarget as Node);
     const isNextMonth = self.nextMonthNav.contains(eventTarget as Node);
