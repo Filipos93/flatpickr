@@ -1293,7 +1293,11 @@ function FlatpickrInstance(
     };
   }
 
-  function changeMonth(value: number, isOffset = true) {
+  function changeMonth(
+    value: number,
+    isOffset = true,
+    wasTriggeredByKeyboard = false
+  ) {
     const delta = isOffset ? value : value - self.currentMonth;
 
     if (
@@ -1315,7 +1319,7 @@ function FlatpickrInstance(
     buildDays();
 
     triggerEvent("onMonthChange");
-    updateNavigationCurrentMonth();
+    updateNavigationCurrentMonth(wasTriggeredByKeyboard);
   }
 
   function clear(triggerChangeEvent = true, toInitial = true) {
@@ -2757,7 +2761,7 @@ function FlatpickrInstance(
     );
   }
 
-  function updateNavigationCurrentMonth() {
+  function updateNavigationCurrentMonth(wasTriggeredByKeyboard: boolean) {
     if (self.config.noCalendar || self.isMobile || !self.monthNav) return;
 
     self.yearElements.forEach((yearElement, i) => {
@@ -2792,6 +2796,13 @@ function FlatpickrInstance(
       (self.currentYear === self.config.maxDate.getFullYear()
         ? self.currentMonth + 1 > self.config.maxDate.getMonth()
         : self.currentYear > self.config.maxDate.getFullYear());
+
+    if (
+      (self._hideNextMonthArrow || self._hidePrevMonthArrow) &&
+      wasTriggeredByKeyboard
+    ) {
+      focusOnDay(undefined, 0);
+    }
   }
 
   function getDateStr(format: string) {
@@ -2836,7 +2847,7 @@ function FlatpickrInstance(
     const isNextMonth = self.nextMonthNav.contains(eventTarget as Node);
 
     if (isPrevMonth || isNextMonth) {
-      changeMonth(isPrevMonth ? -1 : 1);
+      changeMonth(isPrevMonth ? -1 : 1, true, e?.type === "keydown");
     } else if (
       self.yearElements.indexOf(eventTarget as HTMLInputElement) >= 0
     ) {
