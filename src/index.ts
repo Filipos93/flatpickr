@@ -700,7 +700,6 @@ function FlatpickrInstance(
       dayElement.tabIndex = -1;
 
       if (isDateSelected(date)) {
-        dayElement.tabIndex = 10;
         dayElement.classList.add("selected");
         self.selectedDateElem = dayElement;
 
@@ -922,6 +921,34 @@ function FlatpickrInstance(
     if (self.config.mode === "range" && self.selectedDates.length === 1) {
       onMouseOver();
     }
+
+    if (self.selectedDateElem) {
+      const focusableDayElement = isInView(self.selectedDateElem)
+        ? self.selectedDateElem
+        : getDayElement(self.selectedDateElem.dateObj.getDate());
+
+      if (focusableDayElement) focusableDayElement.tabIndex = 10;
+
+      return;
+    }
+
+    if (self.todayDateElem && isInView(self.todayDateElem)) {
+      self.todayDateElem.tabIndex = 10;
+
+      return;
+    }
+
+    const focusableDayElement = getDayElement(1);
+
+    if (focusableDayElement) focusableDayElement.tabIndex = 10;
+  }
+
+  function getDayElement(day: number): HTMLElement {
+    const daysArray = Array.from(self.days.children);
+    const firstDayOfMonth = daysArray.find((e) => e.innerHTML === "1");
+    const numberOfPrevMonthDays = daysArray.indexOf(firstDayOfMonth as Element);
+
+    return self.days.children[day + numberOfPrevMonthDays - 1] as HTMLElement;
   }
 
   function buildMonthSwitch() {
@@ -1221,7 +1248,7 @@ function FlatpickrInstance(
         ]
       );
       self.amPM.title = self.l10n.toggleTitle;
-      self.amPM.tabIndex = -1;
+      self.amPM.tabIndex = 10;
       self.timeContainer.appendChild(self.amPM);
     }
 
@@ -1748,28 +1775,6 @@ function FlatpickrInstance(
             self._debouncedChange();
           }
 
-          break;
-
-        case 9:
-          if (isTimeObj) {
-            const elems = ([
-              self.selectedDateElem,
-              self.hourElement,
-              self.minuteElement,
-              self.secondElement,
-              self.amPM,
-            ] as Node[])
-              .concat(self.pluginElements)
-              .filter((x) => x) as HTMLInputElement[];
-
-            const i = elems.indexOf(eventTarget as HTMLInputElement);
-
-            if (i !== -1) {
-              const target = elems[i + (e.shiftKey ? -1 : 1)];
-              e.preventDefault();
-              (target || self._input).focus();
-            }
-          }
           break;
 
         default:
@@ -2761,7 +2766,7 @@ function FlatpickrInstance(
     );
   }
 
-  function updateNavigationCurrentMonth(wasTriggeredByKeyboard: boolean) {
+  function updateNavigationCurrentMonth(wasTriggeredByKeyboard = false) {
     if (self.config.noCalendar || self.isMobile || !self.monthNav) return;
 
     self.yearElements.forEach((yearElement, i) => {
