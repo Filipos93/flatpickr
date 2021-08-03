@@ -932,13 +932,17 @@ function FlatpickrInstance(
       return;
     }
 
-    if (self.todayDateElem && isInView(self.todayDateElem)) {
+    if (
+      self.todayDateElem &&
+      isInView(self.todayDateElem) &&
+      isEnabled(self.todayDateElem.dateObj)
+    ) {
       self.todayDateElem.tabIndex = 10;
 
       return;
     }
 
-    const focusableDayElement = getDayElement(1);
+    const focusableDayElement = getFirstAvailableDay(1);
 
     if (focusableDayElement) focusableDayElement.tabIndex = 10;
   }
@@ -2806,7 +2810,7 @@ function FlatpickrInstance(
       (self._hideNextMonthArrow || self._hidePrevMonthArrow) &&
       wasTriggeredByKeyboard
     ) {
-      focusOnDay(undefined, 0);
+      focusOnDay(undefined, 1);
     }
   }
 
