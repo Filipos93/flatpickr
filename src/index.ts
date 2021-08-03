@@ -1949,7 +1949,7 @@ function FlatpickrInstance(
     jumpToDate(undefined);
 
     if (!self.config.noCalendar && e?.type === "keydown") {
-      focusOnDay(undefined, 0);
+      focusOnDay(undefined, 1);
     }
   }
 
