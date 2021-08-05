@@ -927,9 +927,13 @@ function FlatpickrInstance(
         ? self.selectedDateElem
         : getDayElement(self.selectedDateElem.dateObj.getDate());
 
-      if (focusableDayElement) focusableDayElement.tabIndex = 10;
-
-      return;
+      if (
+        focusableDayElement &&
+        !focusableDayElement.classList.contains("flatpickr-disabled")
+      ) {
+        focusableDayElement.tabIndex = 10;
+        return;
+      }
     }
 
     if (
