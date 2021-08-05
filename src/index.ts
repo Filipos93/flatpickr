@@ -1786,6 +1786,36 @@ function FlatpickrInstance(
 
           break;
 
+        case 9:
+          if (!self.calendarContainer.contains(eventTarget as HTMLElement))
+            break;
+
+          e.preventDefault();
+
+          const elements = Array.from(
+            self.calendarContainer.querySelectorAll(
+              "[tabindex='10']:not([disabled]):not(.flatpickr-disabled)"
+            )
+          );
+
+          const targetElementIndex = elements.indexOf(e.target as HTMLElement);
+
+          const elementToFocusIndex =
+            targetElementIndex + (e.shiftKey ? -1 : 1);
+
+          const elementToFocus =
+            elements[
+              elementToFocusIndex > elements.length - 1
+                ? 0
+                : elementToFocusIndex < 0
+                ? elements.length - 1
+                : elementToFocusIndex
+            ];
+
+          (elementToFocus as HTMLElement).focus();
+
+          break;
+
         default:
           break;
       }
