@@ -1361,6 +1361,7 @@ function FlatpickrInstance(
     if (self.mobileInput !== undefined) self.mobileInput.value = "";
 
     self.selectedDates = [];
+    self.selectedDateElem = undefined;
     self.latestSelectedDateObj = undefined;
     if (toInitial === true) {
       self.currentYear = self._initialDate.getFullYear();
