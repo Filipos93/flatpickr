@@ -1,3 +1,5 @@
+This library is based on code from Gregory Petrosyan's flatpickr covered by the following license:
+
 The MIT License (MIT)
 
 Copyright (c) 2017 Gregory Petrosyan
